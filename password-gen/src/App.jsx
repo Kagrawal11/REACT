@@ -1,10 +1,12 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef} from "react";
 
 function App() {
   const [length, setLength] = useState(8);
   const [numberAllowed, setNumberAllowed] = useState(false);
   const [characterAllowed, setCharAllowed] = useState(false);
   const [password, setPassword] = useState("");
+
+  const passwordRef = useRef(null)
 
   const passwordGenerator = useCallback(() => {
     let pass = "";
@@ -25,6 +27,10 @@ function App() {
     passwordGenerator();
   }, [length, numberAllowed, characterAllowed, passwordGenerator]);  // ✅ passwordGenerator ko dependency me dala
 
+  const copyPasswordToClipboard = useCallback(() =>{
+    passwordRef.current.select();
+    window.navigator.clipboard.writeText(password)}, [password])
+
   return (
     <div className="h-screen w-screen flex justify-center items-center bg-black">
       <div className="w-full max-w-md shadow-md rounded-lg px-6 py-4 text-gray-300 bg-gray-800">
@@ -39,16 +45,17 @@ function App() {
             className="outline-none w-full py-2 px-3 bg-transparent text-white"
             placeholder="Generated Password"
             readOnly
+            ref={passwordRef}
           />
 
-          <button className="outline-none bg-blue-500 text-white px-3 py-2 shrink-0">
+          <button onClick={copyPasswordToClipboard} className="outline-none bg-blue-500 text-white px-3 py-2 shrink-0">
             Copy
           </button>
         </div>
 
         <div className="flex flex-col gap-2 mt-4">
           <div className="flex items-center gap-x-2">
-            <input 
+            <input
               type="range"
               min={8}
               max={15}
@@ -56,7 +63,7 @@ function App() {
               className="cursor-pointer"
               onChange={(e) => setLength(Number(e.target.value))}
             />
-            <label>{length}</label>  
+            <label>{length}</label>
           </div>
 
           <div className="flex items-center gap-x-2">
